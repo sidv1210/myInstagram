@@ -5,10 +5,10 @@
              tools:context="com.example.myinstagram.instagram.ExploreFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <ListView
+            android:id="@+id/picture_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="left"
-            android:text="@string/hello_blank_fragment"/>
+            android:gravity="left"/>
 
 </FrameLayout>
