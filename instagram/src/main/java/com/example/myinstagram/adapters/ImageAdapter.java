@@ -88,12 +88,13 @@ public class ImageAdapter extends BaseAdapter {
             viewHolder.image = imageView;
             viewHolder.position = position;
             convertView.setTag(viewHolder);
-        } else {
+            new MyGridView().execute(viewHolder);
+        } /*else {
             viewHolder = (ViewHolder) convertView.getTag();
             ((ImageView) convertView).setImageBitmap(null);
-        }
+        }*/
 
-        new MyGridView().execute(viewHolder);
+
 
         return convertView;
     }

@@ -34,8 +34,7 @@ public class CameraFragment extends Fragment {
     static final int REQUEST_IMAGE_CAPTURE = 1;
     String mCurrentPhotoPath;
     File storageDir;
-    ImageAdapter imageAdapter;
-    Uri mCapturedImageURI;
+    private GridView gridview;
 
     public CameraFragment() {
         storageDir = Environment.getExternalStoragePublicDirectory(
@@ -64,24 +63,8 @@ public class CameraFragment extends Fragment {
             }
         });
 
-        List<String> imageURLs = new ArrayList<>();
-        String[] fileNames = storageDir.list(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                if (new File(dir, name).isDirectory())
-                    return false;
-                return name.toLowerCase().endsWith(".jpg");
-            }
-        });
-        if(fileNames!=null && fileNames.length>0){
-            Arrays.sort(fileNames);
-            for (String bitmapFileName : fileNames) {
-                imageURLs.add(storageDir.getPath() + "/" + bitmapFileName);
-            }
-        }
-        imageAdapter = new ImageAdapter(getActivity(), imageURLs);
-        GridView gridview = (GridView) view.findViewById(R.id.gridview);
-        gridview.setAdapter(imageAdapter);
+        gridview = (GridView) view.findViewById(R.id.gridview);
+        gridview.setAdapter(new ImageAdapter(getActivity(), getCapturedImagePaths()));
 
         return view;
     }
@@ -95,6 +78,8 @@ public class CameraFragment extends Fragment {
             cursor.moveToFirst();
             String capturedImageFilePath = cursor.getString(column_index_data);
             cursor.close();*/
+            ImageAdapter imageAdapter = (ImageAdapter) gridview.getAdapter();
+//            gridview.setAdapter(new ImageAdapter(getActivity(), getCapturedImagePaths()));
             imageAdapter.addImageURL(mCurrentPhotoPath);
             imageAdapter.notifyDataSetChanged();
         }
@@ -132,6 +117,24 @@ public class CameraFragment extends Fragment {
         // Save a file: path for use with ACTION_VIEW intents
         mCurrentPhotoPath = image.getAbsolutePath();
         return image;
+    }
+
+    private List<String> getCapturedImagePaths(){
+        List<String> imageURLs = new ArrayList<>();
+        String[] fileNames = storageDir.list(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                if (new File(dir, name).isDirectory())
+                    return false;
+                return name.toLowerCase().endsWith(".jpg");
+            }
+        });
+
+        Arrays.sort(fileNames);
+        for (String bitmapFileName : fileNames) {
+            imageURLs.add(storageDir.getPath() + "/" + bitmapFileName);
+        }
+        return imageURLs;
     }
 
 }
