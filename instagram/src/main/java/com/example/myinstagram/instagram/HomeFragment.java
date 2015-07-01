@@ -1,8 +1,11 @@
 package com.example.myinstagram.instagram;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.res.Resources;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -14,6 +17,10 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.myinstagram.adapters.ImageAdapter;
+import com.example.myinstagram.com.example.myinstagram.utils.Constants;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class HomeFragment extends Fragment {
 
@@ -32,9 +39,9 @@ public class HomeFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         GridView gridview = (GridView) view.findViewById(R.id.gridview);
-        gridview.setAdapter(new ImageAdapter(getActivity()));
+        gridview.setAdapter(new ImageAdapter(getActivity(), null));
+
         return view;
     }
-
 
 }

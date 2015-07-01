@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.os.AsyncTask;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
@@ -18,8 +19,10 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import com.example.myinstagram.com.example.myinstagram.utils.Constants;
 import com.example.myinstagram.instagram.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ImageAdapter extends BaseAdapter {
@@ -32,17 +35,27 @@ public class ImageAdapter extends BaseAdapter {
     private int mShortAnimationDuration;
 
     private Context mContext;
+    private List<String> mImageURLs;
 
-    public ImageAdapter(Context c) {
+    public ImageAdapter(Context c, List<String> imageURLs) {
         mContext = c;
+        mImageURLs = imageURLs;
+    }
+
+    public void addImageURL(String imageURL) {
+        mImageURLs.add(imageURL);
     }
 
     public int getCount() {
-        return drawables.length;
+        if (mImageURLs == null || mImageURLs.isEmpty())
+            return Constants.drawables.length;
+        return mImageURLs.size();
     }
 
     public Object getItem(int position) {
-        return drawables[position];
+        if (mImageURLs == null || mImageURLs.isEmpty())
+            return Constants.drawables[position];
+        return mImageURLs.get(position);
     }
 
     public long getItemId(int position) {
@@ -51,40 +64,77 @@ public class ImageAdapter extends BaseAdapter {
 
     public View getView(int position, View convertView, ViewGroup parent) {
         ImageView imageView;
-        Resources res = mContext.getResources();
+        ViewHolder viewHolder = new ViewHolder();
+
         if (convertView == null) {
             imageView = new ImageView(mContext);
-            imageView.setLayoutParams(new GridView.LayoutParams(GridView.AUTO_FIT, 320));
+            imageView.setLayoutParams(new GridView.LayoutParams(320, 320));
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             imageView.setPadding(8, 8, 8, 8);
+            imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position;
+                    if (mImageURLs != null && !mImageURLs.isEmpty())
+                        position = ((ViewHolder) v.getTag()).position;
+                    else
+                        position = Constants.drawables[((ViewHolder) v.getTag()).position];
+                    zoomImageFromThumb(v, position);
+                }
+            });
+
+            convertView = imageView;
+
+            viewHolder.image = imageView;
+            viewHolder.position = position;
+            convertView.setTag(viewHolder);
         } else {
-            imageView = (ImageView) convertView;
+            viewHolder = (ViewHolder) convertView.getTag();
+            ((ImageView) convertView).setImageBitmap(null);
         }
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
 
-        BitmapFactory.decodeResource(res, drawables[position], options);
+        new MyGridView().execute(viewHolder);
 
-        options.inSampleSize = calculateInSampleSize(options);
-        options.inJustDecodeBounds = false;
-
-        imageView.setImageBitmap(BitmapFactory.decodeResource(res, drawables[position], options));
-
-        imageView.setTag(drawables[position]);
-        imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int id = (Integer) v.getTag();
-                zoomImageFromThumb(v, id);
-            }
-        });
-        return imageView;
+        return convertView;
     }
 
-    private Integer[] drawables = {
-            R.mipmap.sample_1, R.mipmap.sample_2, R.mipmap.sample_3,
-            R.mipmap.sample_4, R.mipmap.sample_5, R.mipmap.sample_6,
-            R.mipmap.sample_7, R.mipmap.sample_8, R.mipmap.sample_9};
+    class ViewHolder {
+        ImageView image;
+        int position;
+    }
+
+    private class MyGridView extends AsyncTask<ViewHolder, Integer, Bitmap> {
+
+        private ViewHolder mViewHolder;
+
+        @Override
+        protected Bitmap doInBackground(ViewHolder... viewHolders) {
+            mViewHolder = viewHolders[0];
+            int position = mViewHolder.position;
+
+            Resources res = mContext.getResources();
+            final BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+
+            if (mImageURLs != null && !mImageURLs.isEmpty())
+                BitmapFactory.decodeFile(mImageURLs.get(position), options);
+            else
+                BitmapFactory.decodeResource(res, Constants.drawables[position], options);
+            options.inSampleSize = calculateInSampleSize(options);
+            options.inJustDecodeBounds = false;
+            if (mImageURLs != null && !mImageURLs.isEmpty())
+                return BitmapFactory.decodeFile(mImageURLs.get(position), options);
+            else
+                return BitmapFactory.decodeResource(res, Constants.drawables[position], options);
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap result) {
+            super.onPostExecute(result);
+            mViewHolder.image.setImageBitmap(result);
+        }
+
+    }
 
     public static int calculateInSampleSize(
             BitmapFactory.Options options) {
@@ -107,7 +157,7 @@ public class ImageAdapter extends BaseAdapter {
         return inSampleSize;
     }
 
-    private void zoomImageFromThumb(final View thumbView, int imageResId) {
+    private void zoomImageFromThumb(final View thumbView, int position) {
         // If there's an animation in progress, cancel it immediately and
         // proceed with this one.
         if (mCurrentAnimator != null) {
@@ -117,7 +167,10 @@ public class ImageAdapter extends BaseAdapter {
         // Load the high-resolution "zoomed-in" image.
         final ImageView expandedImageView = (ImageView) ((Activity) mContext)
                 .findViewById(R.id.expanded_image);
-        expandedImageView.setImageResource(imageResId);
+        if (mImageURLs != null && !mImageURLs.isEmpty())
+            expandedImageView.setImageBitmap(BitmapFactory.decodeFile(mImageURLs.get(position)));
+        else
+            expandedImageView.setImageResource(position);
 
         // Calculate the starting and ending bounds for the zoomed-in image.
         // This step

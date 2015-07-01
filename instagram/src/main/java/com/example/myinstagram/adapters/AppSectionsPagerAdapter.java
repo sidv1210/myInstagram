@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
+import com.example.myinstagram.instagram.CameraFragment;
 import com.example.myinstagram.instagram.DummySectionFragment;
 import com.example.myinstagram.instagram.ExploreFragment;
 import com.example.myinstagram.instagram.HomeFragment;
@@ -23,6 +24,9 @@ public class AppSectionsPagerAdapter extends FragmentPagerAdapter {
 
             case 1:
                 return new ExploreFragment();
+
+            case 2:
+                return new CameraFragment();
 
             default:
                 // The other sections of the app are dummy placeholders.
