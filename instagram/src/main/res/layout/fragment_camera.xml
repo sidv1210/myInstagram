@@ -33,7 +33,7 @@
             android:layout_height="match_parent"
             android:visibility="invisible" />
 
-        <com.example.myinstagram.com.example.myinstagram.utils.FloatingActionButton
+        <com.example.myinstagram.utils.FloatingActionButton
             android:id="@+id/fab"
             android:layout_width="@dimen/fab_size"
             android:layout_height="@dimen/fab_size"
@@ -53,7 +53,7 @@
                 android:layout_gravity="center"
                 android:duplicateParentState="true"/>
 
-        </com.example.myinstagram.com.example.myinstagram.utils.FloatingActionButton>
+        </com.example.myinstagram.utils.FloatingActionButton>
 
     </RelativeLayout>
 </FrameLayout>

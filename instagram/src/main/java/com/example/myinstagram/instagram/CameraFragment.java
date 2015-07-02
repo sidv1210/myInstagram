@@ -1,11 +1,7 @@
 package com.example.myinstagram.instagram;
 
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Intent;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -15,8 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
-import android.widget.ImageView;
 
+import com.example.myinstagram.adapters.GridImageAdapter;
 import com.example.myinstagram.adapters.ImageAdapter;
 
 import java.io.File;
@@ -64,7 +60,7 @@ public class CameraFragment extends Fragment {
         });
 
         gridview = (GridView) view.findViewById(R.id.gridview);
-        gridview.setAdapter(new ImageAdapter(getActivity(), getCapturedImagePaths()));
+        gridview.setAdapter(new GridImageAdapter(getActivity(), getCapturedImagePaths()));
 
         return view;
     }
@@ -72,14 +68,7 @@ public class CameraFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
-            /*String[] projection = {MediaStore.Images.Media.DATA};
-            Cursor cursor = getActivity().getContentResolver().query(mCapturedImageURI, projection, null, null, null);
-            int column_index_data = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            cursor.moveToFirst();
-            String capturedImageFilePath = cursor.getString(column_index_data);
-            cursor.close();*/
             ImageAdapter imageAdapter = (ImageAdapter) gridview.getAdapter();
-//            gridview.setAdapter(new ImageAdapter(getActivity(), getCapturedImagePaths()));
             imageAdapter.addImageURL(mCurrentPhotoPath);
             imageAdapter.notifyDataSetChanged();
         }
@@ -87,9 +76,7 @@ public class CameraFragment extends Fragment {
 
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // Ensure that there's a camera activity to handle the intent
         if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
-            // Create the File where the photo should go
             File photoFile = null;
             try {
                 photoFile = createImageFile();
@@ -104,22 +91,20 @@ public class CameraFragment extends Fragment {
     }
 
     private File createImageFile() throws IOException {
-        // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
 
         File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
+                imageFileName,
+                ".jpg",
+                storageDir
         );
 
-        // Save a file: path for use with ACTION_VIEW intents
         mCurrentPhotoPath = image.getAbsolutePath();
         return image;
     }
 
-    private List<String> getCapturedImagePaths(){
+    private List<String> getCapturedImagePaths() {
         List<String> imageURLs = new ArrayList<>();
         String[] fileNames = storageDir.list(new FilenameFilter() {
             @Override

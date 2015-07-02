@@ -1,4 +1,4 @@
-package com.example.myinstagram.com.example.myinstagram.utils;
+package com.example.myinstagram.utils;
 
 import com.example.myinstagram.instagram.R;
 
