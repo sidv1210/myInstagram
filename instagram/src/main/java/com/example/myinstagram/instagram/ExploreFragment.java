@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.myinstagram.adapters.ExploreFragmentAdapter;
 import com.example.myinstagram.adapters.GridImageAdapter;
 import com.example.myinstagram.adapters.ImageAdapter;
 
@@ -29,7 +30,7 @@ public class ExploreFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_explore, container, false);
         ListView listView = (ListView)rootView.findViewById(R.id.picture_list);
-        listView.setAdapter(new GridImageAdapter(this.getActivity(),null));
+        listView.setAdapter(new ExploreFragmentAdapter(this.getActivity(), null));
         return rootView;
     }
 }

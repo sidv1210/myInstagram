@@ -114,10 +114,11 @@ public class CameraFragment extends Fragment {
                 return name.toLowerCase().endsWith(".jpg");
             }
         });
-
-        Arrays.sort(fileNames);
-        for (String bitmapFileName : fileNames) {
-            imageURLs.add(storageDir.getPath() + "/" + bitmapFileName);
+        if(fileNames!=null && fileNames.length>0){
+            Arrays.sort(fileNames);
+            for (String bitmapFileName : fileNames) {
+                imageURLs.add(storageDir.getPath() + "/" + bitmapFileName);
+            }
         }
         return imageURLs;
     }
